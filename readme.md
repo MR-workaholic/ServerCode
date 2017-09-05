@@ -3,3 +3,6 @@
 
 ### libev_code
  利用libev库去写的一个小型服务器框架，可以实现不同的Method类来实现不同的Server
+
+### MyThread_code
+ 仿照JAVA线程类的风格实现一个C++的线程，并实现一个简答的服务器
