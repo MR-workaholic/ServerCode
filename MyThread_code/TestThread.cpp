@@ -51,15 +51,16 @@ int main(int argc, char *argv[])
   std::cout << "Thread " << thread2.GetThreadName() << " id is " << thread2.GetThreadID()  << "\n";
 
   // sleep(10);
-  std::this_thread::sleep_for(seconds(10));
+  // std::this_thread::sleep_for(seconds(10));
+  thread1.Join();
 
   thread1.SetFunction(g);
   thread1.Start();
   std::cout << "Thread " << thread1.GetThreadName() << " id is " << thread1.GetThreadID()  << "\n";
 
   // sleep(6);
-  std::this_thread::sleep_for(seconds(6));
-
+  // std::this_thread::sleep_for(seconds(6));
+  thread1.Join();
 
   return 0;
 }

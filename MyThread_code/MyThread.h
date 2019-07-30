@@ -7,12 +7,14 @@
 // #include <boost/noncopyable.hpp>
 #include <string>
 #include <functional>
+#include <iostream>
 
 using std::function;
 using std::bind;
 using std::placeholders::_1;
 using std::placeholders::_2;
-
+using std::cout;
+using std::endl;
 
 typedef function<void()> ThreadCall;
 
@@ -27,6 +29,20 @@ private:
 
 };
 
+  class MutexGuard {
+  public:
+    MutexGuard(pthread_mutex_t lock) : _mutex(lock){
+      if (pthread_mutex_lock(&_mutex) != 0){
+        cout << "lock failed"  << endl;
+      }
+    }
+    ~MutexGuard() {
+      pthread_mutex_unlock(&_mutex);
+    }
+  private:
+    pthread_mutex_t _mutex;
+  };
+
 
 class MyThread : Noncopyable
 {
@@ -37,6 +53,8 @@ public:
   bool IsThreadStart() const;
   int Start();
   void SetFunction(ThreadCall);
+  void Join();
+  pthread_mutex_t mutex_flag;
 
 private:
   pthread_t _pid;

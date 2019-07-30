@@ -7,6 +7,12 @@ MyThread::MyThread(const ThreadCall& func, const std::string& threadName):
   _fun(func)
 {
   _pid = 0;
+ if (pthread_mutex_init(&mutex_flag, NULL) != 0) {
+   // 互斥锁初始化失败
+   cout << "init mutex fail" << endl;
+ }else {
+   // std::cout << "init mutex success" << "\n";
+ }
   _thread_start = false;
 }
 
@@ -25,17 +31,26 @@ MyThread::GetThreadID() const
 bool
 MyThread::IsThreadStart() const
 {
-  return _thread_start;
+  bool res;
+  {
+    MutexGuard guard(mutex_flag);
+    res = _thread_start;
+  }
+  return res;
 }
 
 int
 MyThread::Start()
 {
-  if (!_thread_start) {
-    int result = pthread_create(&_pid, NULL, &StartThread, this); // success return 0
-    if (result == 0) {
-      _thread_start = true;
-      return result;
+  //cout << "Start " << _thread_name  << endl;
+  {
+    MutexGuard guard(mutex_flag);
+    if (!_thread_start) {
+      int result = pthread_create(&_pid, NULL, &StartThread, this); // success return 0
+      if (result == 0) {
+        _thread_start = true;
+        return result;
+      }
     }
   }
   return 0;
@@ -53,6 +68,20 @@ MyThread::StartThread(void* obj)
   MyThread* pthis = static_cast<MyThread*>(obj);
   pthis->_fun();
   pthis->_pid = 0;
-  pthis->_thread_start = false;
+  {
+    MutexGuard guard(pthis->mutex_flag);
+    pthis->_thread_start = false;
+  }
   return NULL;
+}
+void
+MyThread::Join() {
+  while (true) {
+    {
+      MutexGuard guard(mutex_flag);
+      if (_thread_start == false) {
+        return ;
+      }
+    }
+  }
 }
