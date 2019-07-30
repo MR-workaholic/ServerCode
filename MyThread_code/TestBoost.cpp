@@ -1,11 +1,23 @@
 // g++ TestBoost.cpp -o Test
 
 #include <iostream>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include <boost/noncopyable.hpp>
+// #include <boost/function.hpp>
+#include <functional>
+// #include <boost/bind.hpp>
+// #include <boost/noncopyable.hpp>
 
-class Test : boost::noncopyable
+class Noncopyable {
+
+protected:
+  Noncopyable(){}
+  ~Noncopyable(){}
+private:
+  Noncopyable(const Noncopyable&);
+  Noncopyable& operator=(const Noncopyable&);
+
+};
+
+class Test : private Noncopyable
 {
 public:
   void ClassPrint()
@@ -34,9 +46,10 @@ void FunctionPrintNum(int a, int b)
   std::cout << "Function Print" << b << " " << a << "\n";
 }
 
-using boost::function;
-using boost::bind;
-
+using std::function;
+using std::bind;
+using std::placeholders::_1;
+using std::placeholders::_2;
 
 
 int main(int argc, char *argv[])

@@ -2,14 +2,33 @@
 #define _MYTHREAD_H_
 
 #include <pthread.h>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include <boost/noncopyable.hpp>
+// #include <boost/function.hpp>
+// #include <boost/bind.hpp>
+// #include <boost/noncopyable.hpp>
 #include <string>
+#include <functional>
 
-typedef boost::function<void()> ThreadCall;
+using std::function;
+using std::bind;
+using std::placeholders::_1;
+using std::placeholders::_2;
 
-class MyThread : boost::noncopyable
+
+typedef function<void()> ThreadCall;
+
+class Noncopyable {
+
+protected:
+  Noncopyable(){}
+  ~Noncopyable(){}
+private:
+  Noncopyable(const Noncopyable&);
+  Noncopyable& operator=(const Noncopyable&);
+
+};
+
+
+class MyThread : Noncopyable
 {
 public:
   MyThread(const ThreadCall&, const std::string&);
