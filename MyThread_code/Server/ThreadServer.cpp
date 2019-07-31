@@ -1,21 +1,21 @@
 #include "MyThread.h"
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <boost/bind.hpp>
+#include <functional>
 #include <netinet/in.h>         // struct sockaddr_in
 #include <strings.h>            // bzero
 #include <arpa/inet.h>          // htonl inet_aton
 #include <stdlib.h>             // atoi
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 #include <errno.h>
 #include <iostream>
 #include <unistd.h>             // close
 #include <time.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
-// typedef boost::unordered_map<pthread_t, int> unordered_map;
-typedef boost::shared_ptr<MyThread> MyThreadPtr;
-typedef boost::unordered_map<int, MyThreadPtr> MapToThreadPtr;
+// typedef std::unordered_map<pthread_t, int> unordered_map;
+typedef std::shared_ptr<MyThread> MyThreadPtr;
+typedef std::unordered_map<int, MyThreadPtr> MapToThreadPtr;
 int listenfd;
 struct sockaddr_in serverAddr;
 // unordered_map clientfdMap;
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
   listen(listenfd, LISTENQ);
   while (true) {
     int clientfd = accept(listenfd, NULL, NULL);
-    ThreadCall f = boost::bind(&ThreadCallFun, clientfd);
+    ThreadCall f = std::bind(&ThreadCallFun, clientfd);
     MyThreadPtr thread(new MyThread(f, "thread")); //MyThreadptr is RAII and will delete when left the scope
     thread->Start();
     clientThreadMap.insert(MapToThreadPtr::value_type(clientfd, thread));
